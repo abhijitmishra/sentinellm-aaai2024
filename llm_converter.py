@@ -157,10 +157,10 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Argument parser for model training.")
 
     # Model name or path argument (mandatory)
-    parser.add_argument("model_name_or_path", type=str, help="Name or path of the model")
+    parser.add_argument("--model_name_or_path", type=str, help="Name or path of the model")
 
     # Destination directory argument (mandatory)
-    parser.add_argument("destination_dir", type=str, help="Destination directory for the model")
+    parser.add_argument("--destination_dir", type=str, help="Destination directory for the model")
 
     # Encryption key argument (optional with default value)
     parser.add_argument("--encryption_key", type=str, default="languagemodel123", 
