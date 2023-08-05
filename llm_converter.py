@@ -80,7 +80,7 @@ def shuffle_embedding_matrix(arr, row_index_mapping):
 
 # Replace 'model_name' with the name or path of the pre-trained model you want to use
 def encrypt_and_manipulate_tokenizer(
-    key: str, model_name_or_path: str, destination: str, logger
+    key: str, model_name_or_path: str, destination: str, shuffle: bool, logger
 ):
     logger.info(f"Encrypting and shuffling vocabulary")
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
@@ -97,7 +97,11 @@ def encrypt_and_manipulate_tokenizer(
         new_element = encrypt_token_using_blake(key=key, token=element)
         vocabulary[new_element] = vocabulary.pop(element)
 
-    new_vocab, mapping = random_shuffle(vocabulary)
+    if shuffle:    
+        new_vocab, mapping = random_shuffle(vocabulary)
+    else: 
+        mapping = {}
+        new_vocab = vocabulary
 
     with open(destination + "/tokenizer.json", "r") as f:
         tokenizer_value = json.load(f)
@@ -125,10 +129,10 @@ def encrypt_and_manipulate_tokenizer(
 
 
 def encrypt_and_manipulate_base_model(
-    key: str, model_name_or_path: str, destination: str, logger, transform_parameter=2
+    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2
 ):
     # First encrypt the vocab using the keyed encryption algorithm 
-    mapping = encrypt_and_manipulate_tokenizer(key, model_name_or_path, destination, logger=logger)
+    mapping = encrypt_and_manipulate_tokenizer(key, model_name_or_path, destination, shuffle, logger=logger)
 
     # Load the base model 
     model = AutoModel.from_pretrained(model_name_or_path)
@@ -138,7 +142,8 @@ def encrypt_and_manipulate_base_model(
     logger.info(token_embedding_weights.shape)
 
     # Rearrange the embedding weights based on tokenizer shuffling
-    token_embedding_weights = shuffle_embedding_matrix(token_embedding_weights, mapping)
+    if shuffle:
+        token_embedding_weights = shuffle_embedding_matrix(token_embedding_weights, mapping)
 
     # Corrupt the embedding weights multiple times based on glide rotation (with distances between vocab items preserved)
     
@@ -169,6 +174,9 @@ def parse_arguments():
     # Seed argument (optional with default value)
     parser.add_argument("--seed", type=int, default=42, help="Seed value (default: 42)")
 
+    # Shuffle argument (optional with default value)
+    parser.add_argument("--shuffle", action="store_true", help="Shuffle the tokenizer and token embedding indices")
+
     args = parser.parse_args()
     return args
 
@@ -185,7 +193,7 @@ if __name__ == "__main__":
 
     logger = setup_logger()
     encrypt_and_manipulate_base_model(
-        key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, logger = logger
+        key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, shuffle=args.shuffle, logger = logger
     )
 
     logger.info(f"Model and tokenizer exported to {destination_dir}")
