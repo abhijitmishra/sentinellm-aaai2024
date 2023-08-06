@@ -39,7 +39,7 @@ def encrypt_token_using_blake(key, token, digest_size=16):
 def random_shuffle(input_data, shuffle_param=10, seed=42):
     # If the input is a dictionary, perform the previous functionality
     original_dict = dict(input_data)
-    value_list = list(input_data.values())
+    value_list = sorted(list(map(int,input_data.values())))
     value_mapping_keys = []
     for i in value_list:
         value_mapping_keys.append(int(i))
