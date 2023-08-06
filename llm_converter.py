@@ -45,7 +45,7 @@ def random_shuffle(input_data, shuffle_param=10, seed=42):
         value_mapping_keys.append(int(i))
 
     for i in range(shuffle_param):
-        random.random.Random(seed).shuffle(value_list)
+        random.Random(seed).shuffle(value_list)
     value_mapping = dict(zip(value_mapping_keys, value_list))
     new_dict = {}
     tokens = list(original_dict.keys())
