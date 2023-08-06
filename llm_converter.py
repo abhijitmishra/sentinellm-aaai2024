@@ -177,6 +177,9 @@ def parse_arguments():
     # Shuffle argument (optional with default value)
     parser.add_argument("--shuffle", action="store_true", help="Shuffle the tokenizer and token embedding indices")
 
+    # Dump additional files for debugging purposes
+    parser.add_argument("--debug", action="store_true", help="Dump file for debugging purposes")
+
     args = parser.parse_args()
     return args
 
@@ -195,6 +198,7 @@ if __name__ == "__main__":
     mapping = encrypt_and_manipulate_base_model(
         key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, shuffle=args.shuffle, logger = logger, seed=seed
     )
-    with open (f"{destination_dir}/mapping.json","w") as f:
-        json.dump(mapping,f)
+    if args.debug:
+        with open (f"{destination_dir}/mapping.json","w") as f:
+            json.dump(mapping,f)
     logger.info(f"Model and tokenizer exported to {destination_dir}")
