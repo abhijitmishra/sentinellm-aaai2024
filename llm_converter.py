@@ -192,8 +192,9 @@ if __name__ == "__main__":
     random.seed(seed)
 
     logger = setup_logger()
-    encrypt_and_manipulate_base_model(
+    mapping = encrypt_and_manipulate_base_model(
         key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, shuffle=args.shuffle, logger = logger, seed=seed
     )
-
+    with open (f"{destination_dir}/mapping.json") as f:
+        json.dump(mapping,f)
     logger.info(f"Model and tokenizer exported to {destination_dir}")
