@@ -36,21 +36,21 @@ def encrypt_token_using_blake(key, token, digest_size=16):
     return h.hexdigest()
 
 
-def random_shuffle(input_data, shuffle_param=10):
+def random_shuffle(input_data, shuffle_param=10, seed=42):
     # If the input is a dictionary, perform the previous functionality
     original_dict = dict(input_data)
     value_list = list(input_data.values())
     value_mapping_keys = []
     for i in value_list:
-        value_mapping_keys.append(i)
+        value_mapping_keys.append(int(i))
 
     for i in range(shuffle_param):
-        random.shuffle(value_list)
+        random.random.Random(seed).shuffle(value_list)
     value_mapping = dict(zip(value_mapping_keys, value_list))
     new_dict = {}
     tokens = list(original_dict.keys())
     for token in tokens:
-        old_value = original_dict[token]
+        old_value = int(original_dict[token])
         new_value = value_mapping[old_value]
         new_dict[token] = new_value
     return new_dict, value_mapping
@@ -80,7 +80,7 @@ def shuffle_embedding_matrix(arr, row_index_mapping):
 
 # Replace 'model_name' with the name or path of the pre-trained model you want to use
 def encrypt_and_manipulate_tokenizer(
-    key: str, model_name_or_path: str, destination: str, shuffle: bool, logger
+    key: str, model_name_or_path: str, destination: str, shuffle: bool, logger, seed=42
 ):
     logger.info(f"Encrypting and shuffling vocabulary")
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
@@ -98,7 +98,7 @@ def encrypt_and_manipulate_tokenizer(
         vocabulary[new_element] = vocabulary.pop(element)
 
     if shuffle:    
-        new_vocab, mapping = random_shuffle(vocabulary)
+        new_vocab, mapping = random_shuffle(vocabulary,seed=seed)
     else: 
         mapping = {}
         new_vocab = vocabulary
@@ -129,10 +129,10 @@ def encrypt_and_manipulate_tokenizer(
 
 
 def encrypt_and_manipulate_base_model(
-    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2
+    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2, seed=42
 ):
     # First encrypt the vocab using the keyed encryption algorithm 
-    mapping = encrypt_and_manipulate_tokenizer(key, model_name_or_path, destination, shuffle, logger=logger)
+    mapping = encrypt_and_manipulate_tokenizer(key, model_name_or_path, destination, shuffle, logger=logger, seed=seed)
 
     # Load the base model 
     model = AutoModel.from_pretrained(model_name_or_path)
@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
     logger = setup_logger()
     encrypt_and_manipulate_base_model(
-        key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, shuffle=args.shuffle, logger = logger
+        key=encryption_key, model_name_or_path=model_name_or_path, destination=destination_dir, shuffle=args.shuffle, logger = logger, seed=seed
     )
 
     logger.info(f"Model and tokenizer exported to {destination_dir}")
