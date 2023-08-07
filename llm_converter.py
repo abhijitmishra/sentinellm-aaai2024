@@ -147,10 +147,10 @@ def encrypt_and_manipulate_base_model(
 
     # Corrupt the embedding weights multiple times based on glide rotation (with distances between vocab items preserved)
     
-    #for i in range(transform_parameter):
-    #    random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
-    #    choice = token_embedding_weights[random_indices[0]]
-    #    token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
+    for i in range(transform_parameter):
+        #random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
+        choice = token_embedding_weights.mean(0)[0]
+        token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
     
     model.embeddings.word_embeddings.weight = torch.nn.Parameter(
         torch.tensor(token_embedding_weights)
