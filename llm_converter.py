@@ -36,17 +36,20 @@ def encrypt_token_using_blake(key, token, digest_size=16):
     return h.hexdigest()
 
 
-def random_shuffle(input_data, shuffle_param=10, seed=42):
+def random_shuffle(input_data, special_token_ids,shuffle_param=10, seed=42,):
     # If the input is a dictionary, perform the previous functionality
     original_dict = dict(input_data)
     value_list = sorted(list(map(int,input_data.values())))
     value_mapping_keys = []
     for i in value_list:
-        value_mapping_keys.append(int(i))
+        if int(i) not in list(special_token_ids.values()):
+            value_mapping_keys.append(int(i))
 
-    for i in range(shuffle_param):
+    for s in range(shuffle_param):
         random.Random(seed).shuffle(value_list)
     value_mapping = dict(zip(value_mapping_keys, value_list))
+    for ind in special_token_ids.values():
+        value_mapping[ind] = ind
     new_dict = {}
     tokens = list(original_dict.keys())
     for token in tokens:
@@ -83,6 +86,9 @@ def encrypt_and_manipulate_tokenizer(
     logger.info(f"Encrypting and shuffling vocabulary")
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
+    special_tokens = tokenizer.special_tokens_map
+    special_token_ids = {tok:tokenizer.convert_tokens_to_ids(tok) for tok in special_tokens.values()}
+
     # Save a copy locally first
     tokenizer.save_pretrained(destination)
     vocabulary = tokenizer.get_vocab()
@@ -90,13 +96,13 @@ def encrypt_and_manipulate_tokenizer(
 
     vocabulary_entries = list(vocabulary.keys())
     for element in vocabulary_entries:
-        if element[0] in SPECIAL_CHARS and len(element) > 1:
+        if element in list(special_token_ids.keys()):
             continue
         new_element = encrypt_token_using_blake(key=key, token=element)
         vocabulary[new_element] = vocabulary.pop(element)
 
     if shuffle:    
-        new_vocab, mapping = random_shuffle(vocabulary,seed=seed)
+        new_vocab, mapping = random_shuffle(vocabulary,special_token_ids=special_token_ids,seed=seed)
     else: 
         mapping = {}
         new_vocab = vocabulary
@@ -136,19 +142,21 @@ def encrypt_and_manipulate_base_model(
     model = AutoModel.from_pretrained(model_name_or_path)
 
     # Fetch embeddding weights
-    token_embedding_weights = model.get_input_embeddings().weight.detach().numpy()
+    token_embedding_weights_torch = model.get_input_embeddings().weight
+    token_embedding_weights = token_embedding_weights_torch.detach().numpy()
     logger.info(token_embedding_weights.shape)
-
-    # Rearrange the embedding weights based on tokenizer shuffling
-    if shuffle:
-        token_embedding_weights = shuffle_embedding_matrix(token_embedding_weights, mapping)
 
     # Corrupt the embedding weights multiple times based on glide rotation (with distances between vocab items preserved)
     
     for i in range(transform_parameter):
-        #random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
-        choice = token_embedding_weights.mean(0)[0]
+        random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
+        #choice = token_embedding_weights.mean(0)[0]
+        choice = token_embedding_weights[random_indices[0]]
         token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
+    
+    # Rearrange the embedding weights based on tokenizer shuffling
+    if shuffle:
+        token_embedding_weights = shuffle_embedding_matrix(token_embedding_weights, mapping)
     
     model.embeddings.word_embeddings.weight = torch.nn.Parameter(
         torch.tensor(token_embedding_weights)
