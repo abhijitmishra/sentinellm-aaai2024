@@ -71,9 +71,7 @@ def shuffle_embedding_matrix(arr, row_index_mapping):
     for entry in row_index_mapping.keys():
         if entry not in covered:
             new_val = row_index_mapping[entry]
-            tmp_row = arr[entry].copy()
-            arr[entry] = arr[new_val]
-            arr[new_val] = tmp_row
+            arr[[entry,new_val]] = arr[[new_val,entry]]
             covered.append(entry)
             covered.append(new_val)
     return arr
