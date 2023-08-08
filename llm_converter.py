@@ -103,7 +103,18 @@ def encrypt_and_manipulate_tokenizer(
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
     special_tokens = tokenizer.special_tokens_map
-    special_token_ids = {tok:tokenizer.convert_tokens_to_ids(tok) for tok in special_tokens.values()}
+    if "t5" in model_name_or_path:
+        special_token_ids = {}
+        for tok in tok in special_tokens.values():
+            if isinstance(tok, list):
+                for fine_toks in tok:
+                    special_token_ids[fine_toks] = tokenizer.convert_tokens_to_ids(fine_toks)
+            else:
+                special_token_ids[tok] = tokenizer.convert_tokens_to_ids(tok)
+    else:
+        special_token_ids = {tok:tokenizer.convert_tokens_to_ids(tok) for tok in special_tokens.values()}
+    
+    
 
     # Save a copy locally first
     tokenizer.save_pretrained(destination)
