@@ -155,8 +155,9 @@ def encrypt_and_manipulate_tokenizer(
             json.dump(new_vocab, f, indent=2)
             
     else:
+        logger.info("No separate vocab files found ")
         logger.info(tokenizer.vocab_files_names)
-        raise ValueError("No vocabulary file found.")
+        #raise ValueError("No vocabulary file found.")
 
     logger.info(f"Updated vocabulary size: {len(vocabulary)}")
     return mapping
@@ -179,21 +180,31 @@ def encrypt_and_manipulate_base_model(
 
     # Corrupt the embedding weights multiple times based on glide rotation (with distances between vocab items preserved)
     original_mean = np.mean(token_embedding_weights,axis=0)
-    dist, nearest_indices = cKDTree(token_embedding_weights).query(original_mean, k=transform_parameter)
-    for i in nearest_indices:
-        #random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
-        #choice = token_embedding_weights[random_indices[0]]
-        #choice = token_embedding_weights.mean(0)[0]
-        choice = token_embedding_weights[i]
+    dist, nearest_indices = cKDTree(token_embedding_weights).query(original_mean, k=100)
+    for tp in range(transform_parameter):
+        choice_idx = np.random.choice(nearest_indices, size=1,replace=True)
+        choice = token_embedding_weights[choice_idx]
         token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
+    #for i in nearest_indices:
+    #    random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
+    #    choice = token_embedding_weights[random_indices[0]]
+    #    #choice = token_embedding_weights.mean(0)[0]
+    #    choice = token_embedding_weights[i]
+    #    token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
     
     # Rearrange the embedding weights based on tokenizer shuffling
     if shuffle:
         token_embedding_weights = shuffle_embedding_matrix(token_embedding_weights, mapping)
     
-    model.embeddings.word_embeddings.weight = torch.nn.Parameter(
-        torch.tensor(token_embedding_weights)
-    )
+    if "t5" in model_name_or_path:
+        model.shared.weight = torch.nn.Parameter(
+            torch.tensor(token_embedding_weights))
+        model.encoder.embed_tokens.weight = torch.nn.Parameter(
+            torch.tensor(token_embedding_weights))
+    else:
+        model.embeddings.word_embeddings.weight = torch.nn.Parameter(
+            torch.tensor(token_embedding_weights)
+        )
     model.save_pretrained(destination)
     return mapping
 
