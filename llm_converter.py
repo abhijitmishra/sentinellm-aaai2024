@@ -35,7 +35,7 @@ def encrypt_token_using_blake(key, token, digest_size=16):
     return h.hexdigest()
 
 
-def random_shuffle(input_data, special_token_ids,shuffle_param=10, seed=42,):
+def random_shuffle(input_data, special_token_ids, seed, shuffle_param=10,):
     # If the input is a dictionary, perform the previous functionality
     original_dict = dict(input_data)
     value_list = sorted(list(map(int,input_data.values())))
@@ -97,7 +97,7 @@ def shuffle_embedding_matrix(arr, row_index_mapping):
 
 # Replace 'model_name' with the name or path of the pre-trained model you want to use
 def encrypt_and_manipulate_tokenizer(
-    key: str, model_name_or_path: str, destination: str, shuffle: bool, logger, seed=42
+    key: str, model_name_or_path: str, destination: str, shuffle: bool, logger, seed
 ):
     logger.info(f"Encrypting and shuffling vocabulary")
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
@@ -164,7 +164,7 @@ def encrypt_and_manipulate_tokenizer(
 
 
 def encrypt_and_manipulate_base_model(
-    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2, seed=42
+    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2, seed
 ):
     logger.info(f"Manipulating Embeddings with a transform factor {transform_parameter}")
     # First encrypt the vocab using the keyed encryption algorithm 
@@ -213,9 +213,6 @@ def parse_arguments():
                         help="Encryption key (default: languagemodel123)")
 
     # Seed argument (optional with default value)
-    parser.add_argument("--seed", type=int, default=42, help="Seed value (default: 42)")
-
-    # Seed argument (optional with default value)
     parser.add_argument("--embedding_rescaling_factor", type=int, default=2, help="Degree of distance preserving pollution of embeddings")
 
     # Shuffle argument (optional with default value)
@@ -228,6 +225,8 @@ def parse_arguments():
     return args
 
 if __name__ == "__main__":
+    def convertToNumber (s):
+        return int.from_bytes(s.encode(), 'little')
     args = parse_arguments()
 
     # Accessing the arguments
@@ -235,11 +234,13 @@ if __name__ == "__main__":
     encryption_key = args.encryption_key
     destination_dir = args.destination_dir
     embedding_rescaling_factor = args.embedding_rescaling_factor
-    seed = args.seed
+    seed = convertToNumber(encryption_key)
     np.random.seed(seed)
     random.seed(seed)
+    
 
     logger = setup_logger()
+    logger.info(f"Adapting model {model_name_or_path} with seed {seed}")
     mapping = encrypt_and_manipulate_base_model(
         key=encryption_key, model_name_or_path=model_name_or_path, 
         destination=destination_dir, 
