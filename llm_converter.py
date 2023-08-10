@@ -164,7 +164,7 @@ def encrypt_and_manipulate_tokenizer(
 
 
 def encrypt_and_manipulate_base_model(
-    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, transform_parameter=2, seed
+    key: str, model_name_or_path: str, destination: str, shuffle:bool, logger, seed, transform_parameter=2
 ):
     logger.info(f"Manipulating Embeddings with a transform factor {transform_parameter}")
     # First encrypt the vocab using the keyed encryption algorithm 
