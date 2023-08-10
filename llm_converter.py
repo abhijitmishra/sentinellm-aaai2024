@@ -178,19 +178,12 @@ def encrypt_and_manipulate_base_model(
     token_embedding_weights = token_embedding_weights_torch.detach().numpy()
     logger.info(token_embedding_weights.shape)
 
-    # Corrupt the embedding weights multiple times based on glide rotation (with distances between vocab items preserved)
-    original_mean = np.mean(token_embedding_weights,axis=0)
-    dist, nearest_indices = cKDTree(token_embedding_weights).query(original_mean, k=100)
-    for tp in range(transform_parameter):
-        choice_idx = np.random.choice(nearest_indices, size=1,replace=True)
-        choice = token_embedding_weights[choice_idx]
-        token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
-    #for i in nearest_indices:
-    #    random_indices = np.random.choice(token_embedding_weights.shape[0], size=1, replace=False)
-    #    choice = token_embedding_weights[random_indices[0]]
-    #    #choice = token_embedding_weights.mean(0)[0]
-    #    choice = token_embedding_weights[i]
-    #    token_embedding_weights = glide_rotation(token_embedding_weights, line=choice, translation=choice)
+    for _ in range(transform_parameter):
+        line = np.ones(token_embedding_weights.shape[1])*random.random() #token_embedding_weights[line_idx]
+        translation = np.ones(token_embedding_weights.shape[1])*random.random() #token_embedding_weights[translation_idx]
+        print ("Line", line[:5])
+        print ("TR",translation[:5])
+        token_embedding_weights = glide_rotation(token_embedding_weights, line=line, translation=translation)
     
     # Rearrange the embedding weights based on tokenizer shuffling
     if shuffle:
