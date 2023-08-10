@@ -181,8 +181,6 @@ def encrypt_and_manipulate_base_model(
     for _ in range(transform_parameter):
         line = np.ones(token_embedding_weights.shape[1])*random.random() #token_embedding_weights[line_idx]
         translation = np.ones(token_embedding_weights.shape[1])*random.random() #token_embedding_weights[translation_idx]
-        print ("Line", line[:5])
-        print ("TR",translation[:5])
         token_embedding_weights = glide_rotation(token_embedding_weights, line=line, translation=translation)
     
     # Rearrange the embedding weights based on tokenizer shuffling
