@@ -225,8 +225,10 @@ def parse_arguments():
     return args
 
 if __name__ == "__main__":
-    def convertToNumber (s):
-        return int.from_bytes(s.encode(), 'little')
+    def prepare_seed (s):
+        hash_value = hash(s)  # Get the hash value of the string
+        small_number = hash_value % 10000  
+        return small_number
     args = parse_arguments()
 
     # Accessing the arguments
@@ -234,7 +236,7 @@ if __name__ == "__main__":
     encryption_key = args.encryption_key
     destination_dir = args.destination_dir
     embedding_rescaling_factor = args.embedding_rescaling_factor
-    seed = convertToNumber(encryption_key)
+    seed = prepare_seed(encryption_key)
     np.random.seed(seed)
     random.seed(seed)
     
