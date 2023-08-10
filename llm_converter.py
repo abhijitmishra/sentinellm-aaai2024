@@ -225,10 +225,14 @@ def parse_arguments():
     return args
 
 if __name__ == "__main__":
-    def prepare_seed (s):
-        hash_value = hash(s)  # Get the hash value of the string
-        small_number = hash_value % 10000  
+    
+    def prepare_seed(input_string, max_value=10000):
+        total_value = 0
+        for char in input_string:
+            total_value += ord(char)
+        small_number = total_value % max_value
         return small_number
+    
     args = parse_arguments()
 
     # Accessing the arguments
