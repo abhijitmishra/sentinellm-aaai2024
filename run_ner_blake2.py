@@ -403,7 +403,7 @@ def main():
         )
         tokenizer._tokenize = lambda x: x.split()
         tokenizer.tokenize = lambda x: x.split()
-        pre_tokenizer = AutoTokenizer.from_pretrained("roberta-base")
+        pre_tokenizer = AutoTokenizer.from_pretrained("roberta-base",add_prefix_space=True)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name_or_path,
@@ -413,6 +413,8 @@ def main():
             token=model_args.token,
             trust_remote_code=model_args.trust_remote_code,
         )
+        tokenizer._tokenize = lambda x: x.split()
+        tokenizer.tokenize = lambda x: x.split()
         pre_tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
     model = AutoModelForTokenClassification.from_pretrained(
@@ -427,12 +429,12 @@ def main():
     )
 
     # Tokenizer check: this script requires a fast tokenizer.
-    if not isinstance(tokenizer, PreTrainedTokenizerFast):
-        raise ValueError(
-            "This example script only works for models that have a fast tokenizer. Checkout the big table of models at"
-            " https://huggingface.co/transformers/index.html#supported-frameworks to find the model types that meet"
-            " this requirement"
-        )
+    #if not isinstance(tokenizer, PreTrainedTokenizerFast):
+    #    raise ValueError(
+    #        "This example script only works for models that have a fast tokenizer. Checkout the big table of models at"
+    #        " https://huggingface.co/transformers/index.html#supported-frameworks to find the model types that meet"
+    #        " this requirement"
+    #    )
 
     # Model has labels -> use them.
     if model.config.label2id != PretrainedConfig(num_labels=num_labels).label2id:
@@ -487,7 +489,7 @@ def main():
             new_example.append(new_tok)
             word_ids.append(wid)
         assert len(pre_tokenizer_tokens) == len(new_example), f"Length mismatch {pre_tokenizer_tokens}, {new_example}"
-        target.append(new_example)
+        target.append(" ".join(new_example))
         word_id_list.append(word_ids)
       return target, word_id_list
 
@@ -500,7 +502,6 @@ def main():
             truncation=True,
             max_length=data_args.max_seq_length,
             # We use this argument because the texts in our dataset are lists of words (with a label for each word).
-            is_split_into_words=True,
         )
         labels = []
         for i, label in enumerate(examples[label_column_name]):
