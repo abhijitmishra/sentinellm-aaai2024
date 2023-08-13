@@ -7,6 +7,7 @@ import random
 import json
 import argparse
 from scipy.spatial import cKDTree
+import sentencepiece as spm
 
 def setup_logger():
     logger = logging.getLogger(__name__)
@@ -118,6 +119,7 @@ def encrypt_and_manipulate_tokenizer(
 
     # Save a copy locally first
     tokenizer.save_pretrained(destination)
+
     vocabulary = tokenizer.get_vocab()
     logger.info(f"Original vocabulary size: {len(vocabulary)}")
 
@@ -153,9 +155,16 @@ def encrypt_and_manipulate_tokenizer(
         # GPT Style Tokenizers (e.g., RoBERTa, GPT2)
         with open(destination + "/vocab.json", "w") as f:
             json.dump(new_vocab, f, indent=2)
-            
+    elif "sentencepiece.bpe.model" in tokenizer.vocab_files_names.values():
+        # Sentencepiece tokenizers (e.g., AlBERT, XLMRoBERTa)
+        # We need to add everything to vocab file and write it back
+        
+        for v in special_token_ids.keys():
+            new_vocab[v] = special_token_ids[v]
+        with open(destination + "/vocab.json", "w") as f:
+            json.dump(new_vocab, f, indent=2)
     else:
-        logger.info("No separate vocab files found ")
+        logger.info("No separate vocab files found.")
         logger.info(tokenizer.vocab_files_names)
         #raise ValueError("No vocabulary file found.")
 

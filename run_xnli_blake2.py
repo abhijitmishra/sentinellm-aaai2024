@@ -51,7 +51,7 @@ from transformers.utils.versions import require_version
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.32.0.dev0")
+#check_min_version("4.32.0.dev0")
 
 require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/text-classification/requirements.txt")
 
@@ -319,8 +319,28 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
         
         )
+        # Original fairseq vocab and spm vocab must be "aligned":
+        fairseq_tokens_to_ids = {"<s>": 0, "<pad>": 1, "</s>": 2, "<unk>": 3}
+        unk_token_id = fairseq_tokens_to_ids["<unk>"]
+        fairseq_offset = 1
+        fairseq_tokens_to_ids["<mask>"] = len(tokenizer.sp_model) + fairseq_offset
+
+        def _convert_token_to_id(token):
+            """Converts a token (str) in an id using the vocab."""
+            if token in fairseq_tokens_to_ids:
+                return fairseq_tokens_to_ids[token]
+            spm_id = vocab.get(token,unk_token_id)
+            # Need to return unknown token if the SP model returned 0
+            return spm_id + fairseq_offset if spm_id else unk_token_id
+        import json 
+        with open(f"{model_args.model_name_or_path}/vocab.json") as f:
+            vocab = json.load(f) 
+            flipped_dict = {value: key for key, value in vocab.items()}
         tokenizer._tokenize = lambda x: x.split()
         tokenizer.tokenize = lambda x: x.split()
+        tokenizer._convert_token_to_id = _convert_token_to_id
+        tokenizer.convert_token_to_id = _convert_token_to_id
+        
         pre_tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
         
     else:
