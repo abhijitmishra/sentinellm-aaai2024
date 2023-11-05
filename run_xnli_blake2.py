@@ -402,13 +402,15 @@ def main():
         # Tokenize the texts
         premise_list = process_bulk(examples["premise"])
         hypothesis_list = process_bulk(examples["hypothesis"])
-        return tokenizer(
+        data = tokenizer(
             premise_list,
             hypothesis_list,
             padding=padding,
             max_length=data_args.max_seq_length,
             truncation=True,
         )
+        print ("DATA" ,data)
+        return data
 
     if training_args.do_train:
         if data_args.max_train_samples is not None:
