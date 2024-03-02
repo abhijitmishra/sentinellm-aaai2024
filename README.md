@@ -27,4 +27,4 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/YourGitHubUsername/SentinelLMs.git
+   git clone https://github.com/abhijitmishra/sentinellm-aaai2024.git
