@@ -7,9 +7,11 @@
 
 ## Introduction
 
-SentinelLMs introduces a groundbreaking approach to address privacy and security concerns in deploying deep neural language models for AI applications. By enabling these models to perform inference on passkey-encrypted inputs, SentinelLMs ensures that user data remains private and secure, mitigating risks associated with data interception and storage.
+We introduce **SentinelLM**, a groundbreaking approach to address privacy and security concerns in deploying deep neural language models for AI applications. By enabling these models to perform inference on **passkey-encrypted inputs**, we ensure that user data remains private and secure, mitigating risks associated with data interception and storage.
 
-This novel method involves a quick adaptation of pre-trained transformer-based language models, applying irreversible transformations to the tokenizer and token embeddings. This process allows the model to understand encrypted text without the possibility of reverse engineering. Following adaptation, the models are fine-tuned on encrypted versions of training datasets, ensuring performance parity with their unencrypted counterparts.
+This novel method involves a quick adaptation of pre-trained transformer-based language models, applying irreversible transformations to the tokenizer and token embeddings. This process allows the model to understand encrypted text without the possibility of reverse engineering. Following adaptation, the models are fine-tuned on **encrypted versions of training datasets**, ensuring performance parity with their unencrypted counterparts.
+
+You can easily replicate our paper with this repository.
 
 ## Features
 
