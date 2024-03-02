@@ -28,3 +28,20 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
 
    ```bash
    git clone https://github.com/abhijitmishra/sentinellm-aaai2024.git
+   
+   
+   
+   
+
+
+## Citation
+
+If you find our work useful for your research, please consider citing it as follows:
+
+```bibtex
+@article{mishra2023sentinellms,
+  title={SentinelLMs: Encrypted Input Adaptation and Fine-tuning of Language Models for Private and Secure Inference},
+  author={Mishra, Abhijit and Li, Mingda and Deo, Soham},
+  journal={arXiv preprint arXiv:2312.17342},
+  year={2023}
+}
