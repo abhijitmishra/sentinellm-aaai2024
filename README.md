@@ -29,9 +29,6 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
    ```bash
    git clone https://github.com/abhijitmishra/sentinellm-aaai2024.git
    
-   
-   
-   
 2. **Install Dependencies**
 
 Navigate to the project directory and install the required dependencies:
