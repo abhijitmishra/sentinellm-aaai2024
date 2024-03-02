@@ -36,7 +36,11 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
     ```bash
     pip install -r requirements.txt
     ```
-    
+3. **Model Encryption**
+
+4. **Fine-Tuning on NLP Tasks**
+
+
 ## Citation
 
 If you find our work useful for your research, please consider citing it as follows:
