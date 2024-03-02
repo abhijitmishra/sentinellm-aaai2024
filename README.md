@@ -1,7 +1,8 @@
-# SentinelLMs: Encrypted Input Adaptation and Fine-Tuning for Secure Inference
+# SentinelLMs: Encrypted Input Adaptation and Fine-Tuning for Secure Inference 
 
 <p align="center">
-    📃 <a href="https://arxiv.org/abs/2312.17342" target="_blank">[SentinelLMs@Conference]</a> • 📂 <a href="https://github.com/abhijitmishra/sentinellm-aaai2024/tree/main" target="_blank">[GitHub]</a>
+    📃 <a href="https://arxiv.org/abs/2312.17342" target="_blank">[SentinelLMs@AAAI2024]</a> • 📧 <a href="https://abhijitmishra.github.io/" 
+        target="_blank">[Contact]</a>
 </p>
 
 ## Introduction
