@@ -31,6 +31,7 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
    ```
    
 2. **Install Dependencies**
+    
     Navigate to the project directory and install the required dependencies:
     ```bash
     pip install -r requirements.txt
