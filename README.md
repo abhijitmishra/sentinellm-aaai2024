@@ -40,7 +40,12 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
     
     Use llm_converter.py to create an encrypted version of the language model:
     ```bash
-    !python llm_converter.py --model your_model_name_here --output encrypted_model_name_here
+    !python llm_converter.py \
+        --model_name_or_path your_model_name_here \
+        --destination_dir path_to_destination \
+        --encryption_key your_encryption_key_here \
+        --embedding_rescaling_factor 2 \
+        --shuffle
     ```
     
 4. **Fine-Tuning on NLP Benchmark**
@@ -56,6 +61,10 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
         --encryption_key "llm123"
     ```
     For more detailed examples and information, please refer to the CameraReady branch in this repository under the Code section.
+
+Example models can be accessed through HuggingFace: [🤗 HuggingFace - Mingda/bert-base-uncased-blake2-glide3-key-llm123](https://huggingface.co/Mingda/bert-base-uncased-blake2-glide3-key-llm123).
+
+
 
 ## Citation
 
