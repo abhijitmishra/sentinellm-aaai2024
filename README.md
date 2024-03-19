@@ -60,10 +60,10 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
         --do_eval \
         --encryption_key "llm123"
     ```
-    For more detailed examples and information, please refer to the CameraReady branch in this repository under the Code section.
+    
+For more detailed examples and information, please refer to the [`CameraReady` branch](https://github.com/abhijitmishra/sentinellm-aaai2024/tree/CameraReady) in this repository under the `Code` section.
 
 Example models can be accessed through HuggingFace: [🤗 HuggingFace - Mingda/bert-base-uncased-blake2-glide3-key-llm123](https://huggingface.co/Mingda/bert-base-uncased-blake2-glide3-key-llm123).
-
 
 
 ## Citation
