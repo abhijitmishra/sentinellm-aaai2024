@@ -37,9 +37,25 @@ To begin using SentinelLMs for your secure inference needs, please follow the st
     pip install -r requirements.txt
     ```
 3. **Model Encryption**
-
-4. **Fine-Tuning on NLP Tasks**
-
+    
+    Use llm_converter.py to create an encrypted version of the language model:
+    ```bash
+    !python llm_converter.py --model your_model_name_here --output encrypted_model_name_here
+    ```
+    
+4. **Fine-Tuning on NLP Benchmark**
+    
+    Fine-tune the encrypted language model on specific NLP tasks using the corresponding run_xx_blake2.py script. Here is an example for Named Entity Recognition (NER):
+    ```bash
+    !python run_ner_blake2.py \
+        --model_name_or_path "Mingda/bert-base-uncased-blake2-glide3-key-llm123-shuffled" \
+        --dataset_name conll2003 \
+        --output_dir /tmp/test-ner \
+        --do_train \
+        --do_eval \
+        --encryption_key "llm123"
+    ```
+    For more detailed examples and information, please refer to the CameraReady branch in this repository under the Code section.
 
 ## Citation
 
